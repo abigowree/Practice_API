@@ -1,11 +1,12 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String
 from db.database import Base
 
-class restaurant_info(Base):
-    __tablename__ = "restaurant"
 
-    id = Column(Integer, primary_key=True, index=True)
-    res_name = Column(String)
-    status_check = Column(Boolean)
-    rating=Column(Integer)
-    address=Column(String)
+class Restaurants(Base):
+    __tablename__ = "restaurants"
+
+    id = Column(Integer, primary_key=True)
+    rest_name = Column(String)
+    location = Column(String)
+    contact_person = Column(String)
+    phone = Column(String)

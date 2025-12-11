@@ -1,66 +1,68 @@
+from fastapi import APIRouter, Depends
+from schemas.restaurant import Restaurants_schema
+from models.restaurant import Restaurants
+from sqlalchemy.orm import Session
+from dependencies import connect_to_db
 
-from fastapi import APIRouter,Depends
-from schemas.restaurant import Restaurant
-from db.database import Base,engine
-from dependencies import connect_db
-from sqlalchemy.orm import session
-from models.restaurant import restaurant_info
-
-
-res_router =APIRouter(
-    prefix="/restaurant",
-    tags=["Restaurant"]
-)
-
-@res_router.get("/")
-def get_all_products(dbs:session=Depends(connect_db)):
-    all_product=dbs.query(restaurant_info).all()
-    return all_product
-
-    
+restaurant_router = APIRouter(prefix="/restaurants", tags=["Restaurants"])
 
 
-@res_router.get("/{id}")
-def all_products_by_id(id:int):
-    return {"message":"update all succesfully"}
+@restaurant_router.get("/")
+def get_all_restaurants(dbs: Session = Depends(connect_to_db)):
+    restaurants = dbs.query(Restaurants).all()
+    return restaurants
 
 
-@res_router.post("/")
-def create_products(new_res:Restaurant, dbs:session=Depends(connect_db)):
-    new_entry=restaurant_info(
-        res_name=new_res.res_name,
-        status_check=new_res.status_check,
-        rating=new_res.rating,
-        address=new_res.address
+@restaurant_router.get("/{id}")
+def get_restaurant_by_id(id: int, dbs: Session = Depends(connect_to_db)):
+    find_rest = dbs.query(Restaurants).filter(Restaurants.id == id).first()
+    if not find_rest:
+        return {"message": "invalid id"}
+    return find_rest
 
+
+@restaurant_router.post("/")
+def create_restaurant(new_rest: Restaurants_schema, dbs: Session = Depends(connect_to_db)):
+    valid_entry = Restaurants(
+        rest_name=new_rest.rest_name,
+        location=new_rest.location,
+        contact_person=new_rest.contact_person,
+        phone=new_rest.phone,
     )
-    dbs.add(new_entry)
-    dbs.commmit()
-    dbs.refresh(new_entry)
-
-    
-
-
-@res_router.put("/{id}")
-def update_products(id:int,changed:Restaurant,dbs:session=Depends(connect_db)):
-    changes=dbs.query(restaurant_info).filter(restaurant_info.id==id).first()
-    if not changes:
-        return {"message":"invalid id"}
-    changes.res_name=changed.res_name
-    changes.status_check=changed.status_check ,
-    changes.rating=changed.rating,
-    changes.address=changed.address
-    dbs.add(changes)
+    # adding ops
+    dbs.add(valid_entry)
+    # committing ops
     dbs.commit()
-    dbs.refresh(changes)
-    
+    # refresh table
+    dbs.refresh(valid_entry)
+    return valid_entry
 
-@res_router.delete("/{id}")
-def delete_products(id:int,dbs:session=Depends(connect_db)):
-    deleted=dbs.query(restaurant_info).filter(restaurant_info.id==id).first()
-    if not deleted:
-        return {"message":"invalid id"}
-    dbs.delete(deleted)
-    dbs.commit()
-   
-    return {"message":"id deleted succesfully"}
+
+@restaurant_router.put("/{id}")
+def update_restaurant_by_id(
+    latest_rest: Restaurants_schema, id: int, dbs: Session = Depends(connect_to_db)
+):
+    find_rest = dbs.query(Restaurants).filter(Restaurants.id == id).first()
+    if not find_rest:
+        return {"message": "invalid id"}
+    else:
+        # updating ops
+        find_rest.rest_name = latest_rest.rest_name
+        find_rest.location = latest_rest.location
+        find_rest.contact_person = latest_rest.contact_person
+        find_rest.phone = latest_rest.phone
+
+        # committing ops
+        dbs.commit()
+        # refresh table
+        dbs.refresh(find_rest)
+        return {"message": "updated restaurant successfully"}
+
+
+@restaurant_router.delete("/{id}")
+def delete_restaurant_by_id(id: int, dbs: Session = Depends(connect_to_db)):
+    find_rest = dbs.query(Restaurants).filter(Restaurants.id == id).first()
+    if not find_rest:
+        return {"message": "invalid id"}
+    dbs.delete(find_rest)
+    return {"message": "deleted restaurant successfully"}

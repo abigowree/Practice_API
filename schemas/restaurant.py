@@ -1,8 +1,8 @@
-
 from pydantic import BaseModel
 
-class Restaurant(BaseModel):
-    res_name: str
-    status_check: bool
-    rating: int
-    address: str
+
+class Restaurants_schema(BaseModel):
+    rest_name: str
+    contact_person: str
+    location: str
+    phone: str

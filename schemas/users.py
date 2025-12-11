@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 
-class CustomerTable(BaseModel):
-    user_id:int
-    user_name:str
-    email:str
-    city:str
+
+class CustomerSchema(BaseModel):
+    cust_name: str
+    contact_no: str
+    email: str
+    location: str

@@ -1,7 +1,6 @@
-
 from pydantic import BaseModel
 
-class Foods(BaseModel):
+class Foods_schema(BaseModel):
     food_name: str
     price: int
     qty: int

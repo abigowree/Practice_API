@@ -25,13 +25,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker,declarative_base
 
 username="postgres"
-password="AcademyRootPassword"
+password="Abi%402007-5"
 hostname="localhost"
 port="5432"
 db_name="editdb"
 
 DB_URL=f"postgresql+psycopg2://{username}:{password}@{hostname}:{port}/{db_name}"
-
+ 
 
 
 engine=create_engine(DB_URL)
